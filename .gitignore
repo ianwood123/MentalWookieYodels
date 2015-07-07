@@ -232,3 +232,5 @@ MentalWookieYodels/nbproject/project.xml
 MentalWookieYodels/nbproject/genfiles.properties
 *.properties
 MentalWookieYodels/build.xml
+nbproject/build-impl.xml
+*.xml
