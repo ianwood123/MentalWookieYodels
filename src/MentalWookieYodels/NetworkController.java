@@ -14,10 +14,10 @@ abstract public class NetworkController {
     private MessageReceiver mr;
     //receives messages from the network.
     
-    final MessageQueue outboundMessages;
+    private final MessageQueue outboundMessages;
     //a message queue that holds and operates on messages | these go out
     
-    final MessageQueue inboundMessages;
+    private final MessageQueue inboundMessages;
     //a message queue that holds and operates on messages | these go in
 
     
@@ -67,10 +67,10 @@ abstract public class NetworkController {
         socket.setKeepAlive(true);
         //keeps connection alive
         
-        ms = new MessageSender(socket, outboundMessages);
+        ms = new MessageSender(socket, getOutboundMessages());
         // passes the proper queue and socket to the sender.
         
-        mr = new MessageReceiver(socket, inboundMessages);
+        mr = new MessageReceiver(socket, getInboundMessages());
         //passes the proper queue and socket to the receiver
         
         sendThread = () -> {
@@ -121,5 +121,13 @@ abstract public class NetworkController {
 
     public MessageReceiver getMessageReceiver() {
         return mr;
+    }
+
+    public MessageQueue getOutboundMessages() {
+        return outboundMessages;
+    }
+
+    public MessageQueue getInboundMessages() {
+        return inboundMessages;
     }
 }
