@@ -27,23 +27,21 @@ abstract class MessageController{
     Codec codec;
     
     MessageController(Socket s, MessageQueue q){
+                
         socket = s;
+        //sets socket from NetworkController
+        //this is important, because it references the same object
+        
         queue = q;
+        //sets MessageQueue from NetworkController
+        //this is important, because it references the same object
+        
         exe = Executors.newCachedThreadPool();
+        //executor for creating and running threads
+        
     }
     //here, we have the constructor of the MessageController
-    
-    MessageController(MessageQueue q){
-        queue = q;
-        socket = null;
-        exe = Executors.newCachedThreadPool();
-    }
-    //this is test code and will be removed before submission
-    
-    MessageController(){
-        exe = Executors.newCachedThreadPool();
-    }
-    //once again, test code that will be removed
+
     
     public void setCodec(Codec c){
         codec = c;
@@ -75,26 +73,14 @@ class MessageSender extends MessageController{
     //This is the declaration.
     
     MessageSender(Socket s, MessageQueue q) throws IOException{
-        
-        socket = s;
-        //sets socket from NetworkController
-        //this is important, because it references the same object
-        
-        queue = q;
-        //sets MessageQueue from NetworkController
-        //this is important, because it references the same object
-        
+        super(s,q);
+        //does the superclass constructor first
+
         out = new PrintWriter(socket.getOutputStream(), true);
         //sets the printwriter to be the output stream of the socket
         //this allows us to send text to another computer
-        
+       
     }
-    
-    
-    MessageSender(MessageQueue q) throws IOException{
-
-        queue = q;
-    }//another test 
     
     public boolean isEmpty(){
        return queue.messages.isEmpty();
@@ -119,21 +105,13 @@ class MessageReceiver extends MessageController{
     //this is used to receive data over a socket (network)
     
     MessageReceiver(Socket s, MessageQueue q) throws IOException{
-        
-        socket = s;
-        //sets socket to use to receive text/strings
-        
-        queue = q;
-        //sets queue to use for message creation
+        super(s,q);
+        //superclass constructor first
         
         in = new Scanner(socket.getInputStream());
         //initializes the scanner from the sockets input stream. this
         //allows us to change text we get over the network into messages for
         //interpretation in the application
     }
-    MessageReceiver(MessageQueue q) throws IOException{
-        socket = null;
-        queue = q;
-    }//test code
-    
+
 }

@@ -8,10 +8,10 @@ import java.net.SocketException;
 
 abstract public class NetworkController {
     
-    MessageSender ms;
+    private MessageSender ms;
     //sends messages outside of the network. 
     
-    MessageReceiver mr;
+    private MessageReceiver mr;
     //receives messages from the network.
     
     final MessageQueue outboundMessages;
@@ -29,12 +29,6 @@ abstract public class NetworkController {
     
     final Runnable receiveThread;
     //this contains the code we will run when a message is put into the outboundQueue
-
-    public void addMessage(String x){
-        Message m = new Message (10,x);
-        outboundMessages.push(m);
-    }
-    //test code. may be implemented, but will definitely be different.
     
     public NetworkController(String ip, int port) throws IOException{
         
@@ -43,12 +37,12 @@ abstract public class NetworkController {
 
             @Override
             public void onPush() {
-
+                onOutboundMessageQueueUpdate();
             }
 
             @Override
             public void onShift() {
-
+                onOutboundMessageQueueUpdate();
             }
         };
         //instantiates queue and defines how it acts when updated.
@@ -57,12 +51,12 @@ abstract public class NetworkController {
 
             @Override
             public void onPush() {
-                
+                onInboundMessageQueueUpdate();
             }
 
             @Override
             public void onShift() {
-                
+                onInboundMessageQueueUpdate();
             }
         };
         //instantiates queue and defines how it acts when updated.
@@ -80,7 +74,7 @@ abstract public class NetworkController {
         //passes the proper queue and socket to the receiver
         
         sendThread = () -> {
-            this.outboundThreadBody();
+            outboundThreadBody();
         };
         //defines what runs in the thread that handles output to server
         
@@ -97,51 +91,6 @@ abstract public class NetworkController {
         //than initialization of the actual controller.
         
     }
-    
-    public NetworkController() throws IOException{
-        
-        socket = null;
-        outboundMessages = new MessageQueue() {
-
-            @Override
-            public void onPush() {
-                runThreadOn(ms);
-            }
-            
-
-            @Override
-            public void onShift() {
-
-            }
-        };
-        inboundMessages = new MessageQueue() {
-            
-            @Override
-            public void onPush() {
-
-            }
-
-            @Override
-            public void onShift() {
-                runThreadOn(mr);
-            }
-        };
-        
-        ms = new MessageSender( outboundMessages);
-        mr = new MessageReceiver( inboundMessages);
-        
-        sendThread = () -> {
-            while(!ms.isEmpty()){
-                ms.sendNextMessage();
-            }
-        };
-        
-        receiveThread = () -> {
-        };
-        
-        ms.setThreadRunnable(sendThread);
-        mr.setThreadRunnable(receiveThread);
-    }//test code
 
     public void setKeepAlive(boolean b) throws SocketException{
         socket.setKeepAlive(b);
@@ -165,7 +114,12 @@ abstract public class NetworkController {
     //forces coder to implement these methods.
     //these method names are - I hope - self-explanatory.
     //they handle what to do when an 'eventt is fired. 
+
+    public MessageSender getMessageSender() {
+        return ms;
+    }
+
+    public MessageReceiver getMessageReceiver() {
+        return mr;
+    }
 }
-
-
-
