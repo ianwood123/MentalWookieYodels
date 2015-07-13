@@ -113,7 +113,7 @@ abstract public class NetworkController {
     abstract public void inboundThreadBody();
     //forces coder to implement these methods.
     //these method names are - I hope - self-explanatory.
-    //they handle what to do when an 'eventt is fired. 
+    //they handle what to do when an 'event' is fired. 
 
     public MessageSender getMessageSender() {
         return ms;

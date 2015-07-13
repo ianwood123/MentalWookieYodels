@@ -234,3 +234,4 @@ MentalWookieYodels/nbproject/genfiles.properties
 MentalWookieYodels/build.xml
 nbproject/build-impl.xml
 *.xml
+/GraphicsCanvas/nbproject/private/

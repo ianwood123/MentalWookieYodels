@@ -109,9 +109,15 @@ class MessageReceiver extends MessageController{
         //superclass constructor first
         
         in = new Scanner(socket.getInputStream());
+        in.useDelimiter(codec.getCodecDelimiter());
         //initializes the scanner from the sockets input stream. this
         //allows us to change text we get over the network into messages for
         //interpretation in the application
     }
+    
+    public String getNextLine(){
+        return in.nextLine();
+    }
+    
 
 }
