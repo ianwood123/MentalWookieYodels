@@ -24,11 +24,12 @@ abstract public class NetworkController {
     final Socket socket;
     //The socket we are going to use. 
     
-    final Runnable sendThread;
+    Runnable sendThread;
     //this contains the code we will run when a message is put into the inboundQueue
     
-    final Runnable receiveThread;
+    Runnable receiveThread;
     //this contains the code we will run when a message is put into the outboundQueue
+    Codec codec;
     
     public NetworkController(String ip, int port) throws IOException{
         
@@ -37,12 +38,12 @@ abstract public class NetworkController {
 
             @Override
             public void onPush() {
-                onOutboundMessageQueueUpdate();
+                onOutboundMessageQPush();
             }
 
             @Override
             public void onShift() {
-                onOutboundMessageQueueUpdate();
+                onOutboundMessageQShift();
             }
         };
         //instantiates queue and defines how it acts when updated.
@@ -51,12 +52,12 @@ abstract public class NetworkController {
 
             @Override
             public void onPush() {
-                onInboundMessageQueueUpdate();
+                onInboundMessageQPush();
             }
 
             @Override
             public void onShift() {
-                onInboundMessageQueueUpdate();
+                onInboundMessageQShift();
             }
         };
         //instantiates queue and defines how it acts when updated.
@@ -72,19 +73,8 @@ abstract public class NetworkController {
         
         mr = new MessageReceiver(socket, getInboundMessages());
         //passes the proper queue and socket to the receiver
-        
-        sendThread = () -> {
-            outboundThreadBody();
-        };
-        //defines what runs in the thread that handles output to server
-        
-        receiveThread = () -> {
-            inboundThreadBody();
-        };
-        //defines what runs in the thread that handles input from server
-        
-        ms.setThreadRunnable(sendThread);
-        mr.setThreadRunnable(receiveThread);
+
+
         //required to prevent instantiation issues. all three of these components
         //talk to eachother, and this allows them to do so without issue.
         //this sets the threads in the controllers use the runnable defined later
@@ -104,13 +94,18 @@ abstract public class NetworkController {
     //runs the thread, which simply calls .execute on an ExecutorService
     //in the controller
 
-    abstract public void onOutboundMessageQueueUpdate();
-
-    abstract public void onInboundMessageQueueUpdate();
-
-    abstract public void outboundThreadBody();
-
-    abstract public void inboundThreadBody();
+    public void setRunnables(Runnable in, Runnable out){
+    
+        this.receiveThread = in;
+        this.sendThread = out;
+        ms.setRunnable(sendThread);
+        mr.setRunnable(receiveThread);
+    }
+    
+    abstract public void onOutboundMessageQPush();
+    abstract public void onOutboundMessageQShift();
+    abstract public void onInboundMessageQPush();
+    abstract public void onInboundMessageQShift();
     //forces coder to implement these methods.
     //these method names are - I hope - self-explanatory.
     //they handle what to do when an 'event' is fired. 
@@ -129,5 +124,8 @@ abstract public class NetworkController {
 
     public MessageQueue getInboundMessages() {
         return inboundMessages;
+    }
+    public void setCodec(Codec c){
+        this.codec = c;
     }
 }

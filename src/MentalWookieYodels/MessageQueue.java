@@ -33,6 +33,10 @@ abstract public class MessageQueue{
         return messages.get(0);
     }
     //simply gets the next message.  no change is made to the arraylist
+    
+    public boolean isEmpty(){
+        return this.messages.isEmpty();
+    }
 
     abstract public void onPush();
 
