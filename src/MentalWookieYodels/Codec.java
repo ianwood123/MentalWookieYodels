@@ -1,17 +1,23 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package MentalWookieYodels;
 
-import java.util.ArrayList;
+import Messages.NetworkMessage;
 
+/**
+ *
+ * @author woodi
+ */
 public interface Codec {
-
-    public String getCodecDelimiter();
-    
-    public String encodeAll(ArrayList<Message> msgs);
-
-    public String encode(Message msg);
-
-    public ArrayList<Message> decodeAll(String str);
-
-    public String singularDecode(String str);
-
+    public String getDelimiter();
+    public String getHeader();
+    public String getFooter();
+    public String getObjectIdentifier();
+    public String encode(NetworkMessage message);
+    public String encode(String string);
+    public String decode(String string);
+    public NetworkMessage[] parse(String string);
 }
