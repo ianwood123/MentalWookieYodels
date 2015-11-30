@@ -86,6 +86,7 @@ public class DefaultMessageFactory implements MessageFactory {
                 throw new NonExistentFieldException("No field" + f.getName() + " found on object: " + m.getClass().toString(), ex);
             }
         }
+        items.add(new KeyValue("end",m.getClass().getSimpleName()));
         
         result = new NetworkMessage(items);
         

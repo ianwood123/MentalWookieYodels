@@ -32,6 +32,9 @@ public class NetworkController {
     
     int port;
     
+    NetworkMessageQueue in;
+    NetworkMessageQueue out;
+    
     private NetworkController(){}
     
     public NetworkController(String ip, int port, Codec c, NetworkMessageQueue incoming, NetworkMessageQueue outgoing){
@@ -39,24 +42,24 @@ public class NetworkController {
         this.port = port;
         this.codec = c;
         this.exe = Executors.newCachedThreadPool();
-        
-        try {
-            socket = new Socket(ipAddress,port);
-            socket.setKeepAlive(true);
-        } catch (IOException ex) {
-            Logger.getLogger(NetworkController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
-        this.sender = new Sender(socket, outgoing, c);
-        this.receiver = new Receiver(socket, incoming, c);
-        
-        this.exe.execute(sender);
-        this.exe.execute(receiver);
+        in = incoming;
+        out = outgoing;
     }
     
     public boolean checkConnection(){
         return socket.isConnected();
+    }
+    public boolean disconnect(){
+        sender.shuttingDown = true;
+        receiver.shuttingDown = true;
+        exe.shutdown();
+        try {
+            socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(NetworkController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return socket.isClosed() && exe.isShutdown();
+        
     }
     
     public boolean connect(){  
@@ -66,6 +69,13 @@ public class NetworkController {
         } catch (IOException ex) {
             Logger.getLogger(NetworkController.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
+        this.sender = new Sender(socket, out, codec);
+        this.receiver = new Receiver(socket, in, codec);
+        this.exe.execute(sender);
+        this.exe.execute(receiver);
+        
         return checkConnection();   
     }
 

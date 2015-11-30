@@ -10,5 +10,4 @@ package Messages;
  * @author woodi
  */
 public class Message {
-    
 }
