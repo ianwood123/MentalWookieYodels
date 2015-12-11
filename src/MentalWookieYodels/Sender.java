@@ -42,6 +42,11 @@ class Sender extends NetworkHandler{
                 out.print(s);
                 out.flush();
             }
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Sender.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }
